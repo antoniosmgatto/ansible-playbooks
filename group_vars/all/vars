@@ -1,0 +1,18 @@
+manala_apt_components: ['main', 'contrib', 'non-free']
+manala_apt_repositories:
+- backports
+- security
+- updates
+manala_apt_packages:
+- aptitude
+- curl
+- gzip
+- htop
+- linuxlogo
+- locales
+- nmap
+- rsync
+- screen
+- unzip
+- zip
+manala_timezone_default: Etc/UTC
