@@ -1,8 +1,11 @@
+firewall_allowed_tcp_ports:
+  - 22
+
+hostname_enabled: yes
+hostname_hostname: "{{inventory_hostname}}"
+hostname_hostname_short: "{{hostname_hostname.split('.')[:-1]|join('.')}}"
+
 manala_apt_components: ['main', 'contrib', 'non-free']
-manala_apt_repositories:
-- backports
-- security
-- updates
 manala_apt_packages:
 - aptitude
 - curl
@@ -15,4 +18,46 @@ manala_apt_packages:
 - screen
 - unzip
 - zip
+manala_apt_repositories:
+- backports
+- security
+- updates
+
+manala_motd_template: template/cow.j2
+manala_motd_message:  muuuuuuuuuuuuuuh
+
+manala_ssh_config_sshd:
+  - Port: 22
+  - PasswordAuthentication: yes
+  - PermitRootLogin: yes
+
 manala_timezone_default: Etc/UTC
+
+manala_vim_config_template: config/empty.j2
+manala_vim_config:
+  - '"## General'
+  - 'set encoding=utf8'
+  - 'set number	"# Show line numbers'
+  - 'set linebreak	"# Break lines at word (requires Wrap lines)'
+  - 'set showbreak=+++	"# Wrap-broken line prefix'
+  - 'set textwidth=100	"# Line wrap (number of cols)'
+  - 'set showmatch	"# Highlight matching brace'
+  - 'set visualbell	"# Use visual bell (no beeping)'
+  - 'set hlsearch	"# Highlight all search results'
+  - 'set smartcase	"# Enable smart-case search'
+  - 'set ignorecase	"# Always case-insensitive'
+  - 'set incsearch	"# Searches for strings incrementally'
+  - 'set autoindent	"# Auto-indent new lines'
+  - 'set expandtab	"# Use spaces instead of tabs'
+  - 'set shiftwidth=2	"# Number of auto-indent spaces'
+  - 'set smartindent	"# Enable smart-indent'
+  - 'set smarttab	"# Enable smart-tabs'
+  - 'set softtabstop=2	"# Number of spaces per Tab'
+
+resolv_dns_domain: ''
+resolv_dns_server:
+  - 8.8.8.8
+  - 8.8.4.4
+  - 208.67.222.222
+  - 208.67.220.220
+resolv_searchpath: []

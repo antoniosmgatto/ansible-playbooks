@@ -1,6 +1,6 @@
 # Vagrant hosts for tests
 [app]
-192.168.60.4
+app.test ansible_host=192.168.60.4
 
 # Group has all hosts
 [multi:children]
