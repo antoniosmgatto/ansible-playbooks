@@ -1,34 +1,52 @@
-Rails + Ansible Playbooks
-=====
+# Ansible playbooks
 
-Ansible playbooks to handle a small server setup to running a rails application.
+Ansible playbooks to setup Debian 10 (Buster) servers.
 
-python: 3.7.7
-ansible: 2.9.7
+This repo has the following playbooks:
 
-Vagrant instructions
+- common.yml
 
-TODO
+  Generic setup with security concerns (install basic packages and setup apt, dns, firewall, ssh, sudo, swap, timezone )
 
-### Tips
+## Requirements
 
-Running commands on all servers in a group
+- Python: 3.7
+- Ansible: 2.9+
+- Virtualbox
+
+## Instalation
+
+### Downloading roles
+
+Run `./update-galaxy-roles.sh` to download the roles from [Galaxy](https://galaxy.ansible.com/).
+
+### Vault secret
+
+Create the file `.vault_pass.txt` at the root of the project with
+your secret.
+
+## Tests
+
+This project is configure with [Vagrant](https://www.vagrantup.com/) for tests.
 
 ```bash
-  ansible multi -i test -a "hostname"
+  # to startup the server
+  vagrant up
+
+  # use '-i test' to set the inventory to use vagrant environment
+  ansible-playbook -i test plays/common.yml
 ```
 
-Getting information about the servers with setup module
+Some useful commands:
 
 ```bash
-  ansible multi -i test -m setup
+  # to connect by ssh with vm
+  vagrant ssh
+
+  # to destroy the vm
+  vagrant destroy
 ```
 
-Installing ntp package with apt module inline
+## Licence
 
-```bash
-  ansible multi -i test --become -m apt -a "name=ntp state=present"
-```
-
-
-Update roles/requirements.yml and run ./roles-update.yml to update the project roles from Galaxy
+MIT
