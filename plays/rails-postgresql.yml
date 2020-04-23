@@ -1,0 +1,12 @@
+---
+- hosts: all
+- name: basic server setup
+  import_playbook: common.yml
+
+- hosts: all
+  become: true
+  become_user: root
+  tags: postgres
+  roles:
+    - geerlingguy.postgresql
+
