@@ -1,9 +1,15 @@
 - src: cchurch.admin-users
   version: 0.8.5
+- src: geerlingguy.certbot
+  version: 3.1.0
 - src: geerlingguy.firewall
   version: 2.5.0
+- src: geerlingguy.nginx
+  version: 2.7.0
 - src: geerlingguy.postgresql
   version: 2.2.0
+- src: geerlingguy.ruby
+  version: 2.6.0
 - src: geerlingguy.swap
   version: 1.0.1
 - src: manala.apt
@@ -22,7 +28,15 @@
   version: 2.0.1
 - src: manala.vim
   version: 2.0.1
+- src: rvm.ruby
+  version: v2.1.2
+- role: zzet.rbenv
+  version: 3.4.7
+- src: geerlingguy.redis
+  version: 1.6.0
 - src: stouts.hostname
   version: 1.1.0
+- src: weareinteractive.environment
+  version: 1.5.0
 - src: ypsman.resolv
 
