@@ -1,14 +1,37 @@
 - hosts: all
   become: true
   tags: basic
+  vars:
+    swap_file_size_mb: "{{ 2048 if ansible_memtotal_mb > 2048 else ansible_memtotal_mb }}"
   pre_tasks:
     - name: Set authorized key took from file
       authorized_key:
         user: root
         state: present
         key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
-  vars:
-      swap_file_size_mb: "{{ 2048 if ansible_memtotal_mb > 2048 else ansible_memtotal_mb }}"
+
+    - name: Ensure a locale en_US.UTF-8 exists
+      locale_gen:
+        name: en_US.UTF-8
+        state: present
+
+    - name: Creating admin group
+      group:
+        name: admin
+
+    - name: Creating Admin Users
+      user:
+        name: "{{ item.name }}"
+        shell: /bin/bash
+        groups: admin
+      loop: "{{ admin_users }}"
+
+    - name: Adding authorized keys for admins
+      authorized_key:
+        user: "{{ item.name }}"
+        key: "{{ item.authorized_key }}"
+      loop: "{{ admin_users }}"
+
   roles:
     - role: stouts.hostname
     - role: geerlingguy.swap
