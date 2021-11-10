@@ -71,3 +71,7 @@ Temporary Items
 .history
 .vault_pass.txt
 roles/galaxy/*
+production
+test
+staging
+development
