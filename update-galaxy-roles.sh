@@ -8,7 +8,7 @@ COLOR_RED='\e[0;31m'
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 ROOT_DIR=$(pwd)
 EXTERNAL_ROLE_DIR="$ROOT_DIR/roles/galaxy"
-ROLES_REQUIREMNTS_FILE="$ROOT_DIR/roles/requirements.yml"
+ROLES_REQUIREMNTS_FILE="$ROOT_DIR/roles/requirements.yaml"
 
 # Exit msg
 msg_exit() {
