@@ -1,5 +1,5 @@
-admin_users:
-  # example - { name: "username", authorized_key: "public key" }
+# example - { name: "username", authorized_key: "public key" }
+admin_users: []
 
 firewall_allowed_tcp_ports:
   - 22
