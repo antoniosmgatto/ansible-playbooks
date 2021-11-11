@@ -14,4 +14,6 @@ Vagrant.configure("2") do |config|
     app.vm.hostname = "app.test"
     app.vm.network :private_network, ip: "192.168.60.4"
   end
+
+  # config.vm.network :forwarded_port, guest: 80, host: 4567
 end

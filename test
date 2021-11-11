@@ -1,6 +1,6 @@
 # Vagrant hosts for tests
 [app]
-app.test ansible_host=192.168.60.4 ansible_port=22
+app.test ansible_host=localhost
 
 # Group has all hosts
 [multi:children]
@@ -9,6 +9,6 @@ app
 # variables for all servers
 [multi:vars]
 ansible_user=vagrant
-ansible_port=22
+ansible_port=2222
 ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
 
