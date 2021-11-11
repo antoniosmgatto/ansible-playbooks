@@ -14,49 +14,145 @@
       apt:
         name: "{{ item }}"
         update_cache: yes
-      loop: "{{playbook_basic_packages}}"
+      loop: "{{common_playbook_basic_packages}}"
 
     - name: Ensure a locale en_US.UTF-8 exists
       locale_gen:
         name: en_US.UTF-8
         state: present
 
+    - name: Setting swap
+      include_role:
+        name: geerlingguy.swap
+      tags:
+        - swap
+
+    - name: Setting timezone
+      include_role:
+        name: manala.timezone
+      vars:
+        manala_timezone_default: "{{ common_playbook_timezone }}"
+      tags:
+        - timezone
+
+    - name: Setting ntp servers
+      group:
+        name: manala.ntp
+      tags:
+        - ntp
+
+    - name: Configure ssh
+      include_role:
+        name: willshersystems.sshd
+      vars:
+        sshd_Port: "{{ common_playbook_ssh_port }}"
+        sshd_PasswordAuthentication: no
+        sshd_PermitRootLogin: without-password
+      tags:
+        - ssh
+
+    - name: Setting ssh login message
+      include_role:
+        name: manala.motd
+      vars:
+        manala_motd_template: template/cow.j2
+        manala_motd_message:  muuuuuuuuuuuuuuh
+      tags:
+        - ssh
+
+    - name: Setting vim
+      include_role:
+        name: manala.vim
+      vars:
+        manala_vim_config_template: config/empty.j2
+        manala_vim_config:
+          - '"## General'
+          - 'set encoding=utf8'
+          - 'set number	"# Show line numbers'
+          - 'set linebreak	"# Break lines at word (requires Wrap lines)'
+          - 'set showbreak=+++	"# Wrap-broken line prefix'
+          - 'set textwidth=100	"# Line wrap (number of cols)'
+          - 'set showmatch	"# Highlight matching brace'
+          - 'set visualbell	"# Use visual bell (no beeping)'
+          - 'set hlsearch	"# Highlight all search results'
+          - 'set smartcase	"# Enable smart-case search'
+          - 'set ignorecase	"# Always case-insensitive'
+          - 'set incsearch	"# Searches for strings incrementally'
+          - 'set autoindent	"# Auto-indent new lines'
+          - 'set expandtab	"# Use spaces instead of tabs'
+          - 'set shiftwidth=2	"# Number of auto-indent spaces'
+          - 'set smartindent	"# Enable smart-indent'
+          - 'set smarttab	"# Enable smart-tabs'
+          - 'set softtabstop=2	"# Number of spaces per Tab'
+      tags:
+        - vim
+
+    - name: Set hostname
+      include_role:
+        name: stouts.hostname
+      vars:
+        hostname_enabled: yes
+        hostname_hostname: "{{inventory_hostname}}"
+        hostname_hostname_short: "{{hostname_hostname.split('.')[:-1]|join('.')}}"
+      tags:
+        - hostname
+
+    - name: Setting dns servers
+      include_role:
+        name: ypsman.resolv
+      vars:
+        resolv_dns_domain: ''
+        resolv_dns_server: "{{ common_playbook_dns_servers }}"
+        resolv_searchpath: []
+      tags:
+        - dns
+
+    - name: Setting fail2ban
+      include_role:
+        name: manala.fail2ban
+      tags:
+        - firewall
+
+    - name: Setting firewall rules
+      include_role:
+        name: geerlingguy.firewall
+      vars:
+        firewall_allowed_tcp_ports:
+          - "{{ common_playbook_ssh_port }}"
+      tags:
+        - firewall
+
     - name: Creating admin group
       group:
         name: admin
+      tags:
+        - users
+
+    - name: Setting sudo for admin group
+      include_role:
+        name: manala.sudo
+      vars:
+        manala_sudo_sudoers:
+          - file: admin
+            config:
+              - '%admin': ALL=NOPASSWD:ALL
+      tags:
+        - sudo
+        - users
 
     - name: Creating Admin Users
       user:
         name: "{{ item.name }}"
         shell: /bin/bash
         groups: admin
-      loop: "{{ admin_users }}"
+      loop: "{{ common_playbook_admin_users }}"
+      tags:
+        - users
 
     - name: Adding authorized keys for admins
       authorized_key:
         user: "{{ item.name }}"
         key: "{{ item.authorized_key }}"
-      loop: "{{ admin_users }}"
-
-    - name: Configure ssh
-      include_role:
-        name: willshersystems.sshd
-      vars:
-        sshd_Port: 22
-        sshd_PasswordAuthentication: no
-        sshd_PermitRootLogin: without-password
+      loop: "{{ common_playbook_admin_users }}"
       tags:
-        - ssh
-
-  roles:
-    - role: stouts.hostname
-    - role: geerlingguy.swap
-    - role: ypsman.resolv
-    - role: manala.motd
-    - role: manala.ntp
-    - role: manala.sudo
-    - role: manala.timezone
-    - role: manala.vim
-    - role: willshersystems.sshd
-    - role: manala.fail2ban
-    - role: geerlingguy.firewall
+        - users
