@@ -10,6 +10,12 @@
         state: present
         key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
+    - name: Install basic packages
+      apt:
+        name: "{{ item }}"
+        update_cache: yes
+      loop: "{{playbook_basic_packages}}"
+
     - name: Ensure a locale en_US.UTF-8 exists
       locale_gen:
         name: en_US.UTF-8
@@ -46,7 +52,6 @@
     - role: stouts.hostname
     - role: geerlingguy.swap
     - role: ypsman.resolv
-    - role: manala.apt
     - role: manala.motd
     - role: manala.ntp
     - role: manala.sudo

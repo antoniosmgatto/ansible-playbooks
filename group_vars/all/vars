@@ -8,25 +8,6 @@ hostname_enabled: yes
 hostname_hostname: "{{inventory_hostname}}"
 hostname_hostname_short: "{{hostname_hostname.split('.')[:-1]|join('.')}}"
 
-manala_apt_components: ['main', 'contrib', 'non-free']
-manala_apt_packages:
-- aptitude
-- curl
-- gzip
-- htop
-- linuxlogo
-- locales
-- nmap
-- rsync
-- screen
-- unzip
-- zip
-manala_apt_repositories:
-- backports
-- nginx
-- security
-- updates
-
 manala_motd_template: template/cow.j2
 manala_motd_message:  muuuuuuuuuuuuuuh
 
@@ -57,6 +38,19 @@ manala_vim_config:
   - 'set smartindent	"# Enable smart-indent'
   - 'set smarttab	"# Enable smart-tabs'
   - 'set softtabstop=2	"# Number of spaces per Tab'
+
+playbook_basic_packages:
+  - aptitude
+  - curl
+  - gzip
+  - htop
+  - linuxlogo
+  - locales
+  - nmap
+  - rsync
+  - screen
+  - unzip
+  - zip
 
 resolv_dns_domain: ''
 resolv_dns_server:
