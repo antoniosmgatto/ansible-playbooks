@@ -10,20 +10,28 @@ This repo has the following playbooks:
 
 ## Requirements
 
-- Python: 3.7
-- Ansible: 2.9+
+- Python: 3.9
+- Ansible: 2.10
 - Virtualbox
 
-## Instalation
+## Getting started
 
-### Downloading roles
+```shell
+# install python packages
+pip install -r ./requirements.txt
 
-Run `./update-galaxy-roles.sh` to download the roles from [Galaxy](https://galaxy.ansible.com/).
+# download roles from Galaxy
+./update-galaxy-roles.sh
 
-### Vault secret
+# create file with vault secret
+echo "your-secret-here" > .vault_pass.txt
 
-Create the file `.vault_pass.txt` at the root of the project with
-your secret.
+# create and setup your inventory
+cp inventory.example production
+
+# run playbook
+ ansible-playbook -i production plays/common.yml
+```
 
 ## Tests
 
