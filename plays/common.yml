@@ -101,8 +101,7 @@
       include_role:
         name: geerlingguy.firewall
       vars:
-        firewall_allowed_tcp_ports:
-          - "{{ common_playbook_ssh_port }}"
+        firewall_allowed_tcp_ports: "{{ common_playbook_firewall_tcp_ports }}"
       tags:
         - firewall
 

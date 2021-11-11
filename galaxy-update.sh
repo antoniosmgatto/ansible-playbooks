@@ -7,7 +7,7 @@ COLOR_RED='\e[0;31m'
 # This current directory.
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 ROOT_DIR=$(pwd)
-ROLES_REQUIREMENTS_FILE="$ROOT_DIR/requirements.yaml"
+ROLES_REQUIREMENTS_FILE="$ROOT_DIR/requirements.yml"
 
 # Exit msg
 msg_exit() {
