@@ -22,8 +22,6 @@
   version: 2.0.7
 - src: manala.ntp
   version: 2.0.1
-- src: manala.ssh
-  version: 3.0.3
 - src: manala.sudo
   version: 2.0.6
 - src: manala.timezone
@@ -36,6 +34,8 @@
   version: 1.1.0
 - src: weareinteractive.environment
   version: 1.5.0
+- src: willshersystems.sshd
+  version: v0.14.0
 - src: ypsman.resolv
 - role: zzet.rbenv
   version: 3.5.0

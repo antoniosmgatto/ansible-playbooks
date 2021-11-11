@@ -32,6 +32,16 @@
         key: "{{ item.authorized_key }}"
       loop: "{{ admin_users }}"
 
+    - name: Configure ssh
+      include_role:
+        name: willshersystems.sshd
+      vars:
+        sshd_Port: 22
+        sshd_PasswordAuthentication: no
+        sshd_PermitRootLogin: without-password
+      tags:
+        - ssh
+
   roles:
     - role: stouts.hostname
     - role: geerlingguy.swap
@@ -39,9 +49,9 @@
     - role: manala.apt
     - role: manala.motd
     - role: manala.ntp
-    - role: manala.ssh
     - role: manala.sudo
     - role: manala.timezone
     - role: manala.vim
+    - role: willshersystems.sshd
     - role: manala.fail2ban
     - role: geerlingguy.firewall

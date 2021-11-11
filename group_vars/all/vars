@@ -30,11 +30,6 @@ manala_apt_repositories:
 manala_motd_template: template/cow.j2
 manala_motd_message:  muuuuuuuuuuuuuuh
 
-manala_ssh_config_sshd:
-  - Port: 22
-  - PasswordAuthentication: no
-  - PermitRootLogin: no
-
 manala_sudo_sudoers:
   - file: admin
     config:
