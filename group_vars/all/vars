@@ -1,5 +1,6 @@
 # example - { name: "username", authorized_key: "public key" }
 common_playbook_admin_users: []
+common_playbook_autoupdate_email_address: antonio.s.m.gatto@gmail.com
 common_playbook_basic_packages:
   - aptitude
   - curl

@@ -41,16 +41,6 @@
       tags:
         - ntp
 
-    - name: Configure ssh
-      include_role:
-        name: willshersystems.sshd
-      vars:
-        sshd_Port: "{{ common_playbook_ssh_port }}"
-        sshd_PasswordAuthentication: no
-        sshd_PermitRootLogin: without-password
-      tags:
-        - ssh
-
     - name: Setting ssh login message
       include_role:
         name: manala.motd
@@ -107,12 +97,6 @@
       tags:
         - dns
 
-    - name: Setting fail2ban
-      include_role:
-        name: manala.fail2ban
-      tags:
-        - firewall
-
     - name: Setting firewall rules
       include_role:
         name: geerlingguy.firewall
@@ -156,3 +140,19 @@
       loop: "{{ common_playbook_admin_users }}"
       tags:
         - users
+
+    - name: Setting ssh, autoupdate and fail2ban
+      include_role:
+        name: geerlingguy.security
+      vars:
+        security_ssh_port: "{{ common_playbook_ssh_port }}"
+        security_ssh_password_authentication: "no"
+        security_ssh_permit_root_login: "without-password"
+        security_autoupdate_reboot: "true"
+        security_autoupdate_reboot_time: "10:00"
+        security_autoupdate_mail_to: "{{common_playbook_autoupdate_email_address}}"
+        security_autoupdate_mail_on_error: true
+      tags:
+        - ssh
+        - updates
+        - firewall
