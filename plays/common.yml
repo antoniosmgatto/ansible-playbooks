@@ -4,6 +4,21 @@
   vars:
     swap_file_size_mb: "{{ 2048 if ansible_memtotal_mb > 2048 else ansible_memtotal_mb }}"
   pre_tasks:
+
+    - name: Update cache repo
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      tags:
+        - apt
+
+    - name: Upgrade all apt packages
+      apt:
+        upgrade: dist
+      tags:
+       - apt
+       - upgrade
+
     - name: Set authorized key took from file
       authorized_key:
         user: root
@@ -13,7 +28,6 @@
     - name: Install basic packages
       apt:
         name: "{{ item }}"
-        update_cache: yes
       loop: "{{common_playbook_basic_packages}}"
 
     - name: Ensure a locale en_US.UTF-8 exists
