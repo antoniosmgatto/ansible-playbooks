@@ -3,7 +3,7 @@
   tags: basic
   vars:
     swap_file_size_mb: "{{ 2048 if ansible_memtotal_mb > 2048 else ansible_memtotal_mb }}"
-  pre_tasks:
+  tasks:
 
     - name: Update cache repo
       apt:
