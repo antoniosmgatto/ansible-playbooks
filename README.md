@@ -21,7 +21,7 @@ This repo has the following playbooks:
 pip install -r ./requirements.txt
 
 # download roles from Galaxy
-./update-galaxy-roles.sh
+./galaxy-update.sh
 
 # create file with vault secret
 echo "your-secret-here" > .vault_pass.txt

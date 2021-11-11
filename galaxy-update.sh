@@ -7,8 +7,7 @@ COLOR_RED='\e[0;31m'
 # This current directory.
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 ROOT_DIR=$(pwd)
-EXTERNAL_ROLE_DIR="$ROOT_DIR/roles/galaxy"
-ROLES_REQUIREMNTS_FILE="$ROOT_DIR/roles/requirements.yaml"
+ROLES_REQUIREMENTS_FILE="$ROOT_DIR/requirements.yaml"
 
 # Exit msg
 msg_exit() {
@@ -28,9 +27,9 @@ trap "cleanup"  ERR INT TERM
 [[ -z "$(which ansible-galaxy)" ]] && msg_exit "Ansible is not installed or not in your path."
 
 # Check roles req file
-[[ ! -f "$ROLES_REQUIREMNTS_FILE" ]]  && msg_exit "roles_requirements '$ROLES_REQUIREMNTS_FILE' does not exist or permssion issue.\nPlease check and rerun."
+[[ ! -f "$ROLES_REQUIREMENTS_FILE" ]]  && msg_exit "roles_requirements '$ROLES_REQUIREMENTS_FILE' does not exist or permssion issue.\nPlease check and rerun."
 
-# Install roles
-ansible-galaxy install -r "$ROLES_REQUIREMNTS_FILE" --force --no-deps -p "$EXTERNAL_ROLE_DIR"
+# Install roles and collections
+ansible-galaxy install -r "$ROLES_REQUIREMENTS_FILE"
 
 exit 0
