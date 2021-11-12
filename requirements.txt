@@ -1,1 +1,1 @@
-Ansible==2.10
+ansible<5
