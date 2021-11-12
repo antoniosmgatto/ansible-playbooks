@@ -111,14 +111,6 @@
       tags:
         - dns
 
-    - name: Setting firewall rules
-      include_role:
-        name: geerlingguy.firewall
-      vars:
-        firewall_allowed_tcp_ports: "{{ common_playbook_firewall_tcp_ports }}"
-      tags:
-        - firewall
-
     - name: Creating admin group
       group:
         name: admin
@@ -157,6 +149,11 @@
     - name: Setting ssh, autoupdate and fail2ban
       include_role:
         name: geerlingguy.security
+        apply:
+          tags:
+            - ssh
+            - updates
+            - firewall
       vars:
         security_ssh_port: "{{ common_playbook_ssh_port }}"
         security_ssh_password_authentication: "no"
@@ -165,7 +162,13 @@
         security_autoupdate_reboot_time: "10:00"
         security_autoupdate_mail_to: "{{common_playbook_autoupdate_email_address}}"
         security_autoupdate_mail_on_error: true
-      tags:
-        - ssh
-        - updates
-        - firewall
+
+
+    - name: Setting firewall rules
+      include_role:
+        name: geerlingguy.firewall
+        apply:
+          tags:
+            - firewall
+      vars:
+        firewall_allowed_tcp_ports: "{{ common_playbook_firewall_tcp_ports }}"
