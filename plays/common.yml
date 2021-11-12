@@ -27,8 +27,7 @@
 
     - name: Install basic packages
       apt:
-        name: "{{ item }}"
-      loop: "{{common_playbook_basic_packages}}"
+        name: "{{ common_playbook_basic_packages }}"
 
     - name: Ensure a locale en_US.UTF-8 exists
       locale_gen:
