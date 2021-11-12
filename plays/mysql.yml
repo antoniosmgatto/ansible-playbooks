@@ -1,6 +1,13 @@
+- name: General server setup (apt, sudo, admins, ssh, firewall, etc..)
+  import_playbook: common.yml
+  tags:
+    - basic
+    - bootstrap
+
 - hosts: all
   become: true
-  tags: mysql
+  tags:
+    - mysql
   tasks:
     - name: Installing mysql server
       include_role:
