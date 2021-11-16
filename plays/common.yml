@@ -123,18 +123,14 @@
       tags:
         - users
 
-    - name: Setting sudo for admin group
-      include_role:
-        name: manala.sudo
-        apply:
-          tags:
-            - sudo
-            - users
-      vars:
-        manala_sudo_sudoers:
-          - file: admin
-            config:
-              - '%admin': ALL=(ALL) NOPASSWD:ALL
+    - name: Allow admin members to have passwordless sudo
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/admin
+        content: "%admin ALL=(ALL) NOPASSWD:ALL"
+        validate: visudo -cf %s
+      tags:
+        - sudo
+        - users
 
     - name: Creating Admin Users
       ansible.builtin.group:
