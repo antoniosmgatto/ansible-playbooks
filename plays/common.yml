@@ -123,7 +123,7 @@
         manala_sudo_sudoers:
           - file: admin
             config:
-              - '%admin': ALL=NOPASSWD:ALL
+              - '%admin': ALL=(ALL) NOPASSWD:ALL
       tags:
         - sudo
         - users
