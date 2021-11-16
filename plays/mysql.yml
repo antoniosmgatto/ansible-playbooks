@@ -1,10 +1,7 @@
 - name: General server setup (apt, sudo, admins, ssh, firewall, etc..)
   import_playbook: common.yml
-  tags:
-    - basic
-    - bootstrap
 
-- hosts: all
+- hosts: mysql
   become: true
   tags:
     - mysql
