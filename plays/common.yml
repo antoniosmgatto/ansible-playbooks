@@ -1,6 +1,5 @@
 - hosts: all
   become: true
-  tags: basic
   handlers:
     - name: (Handler) Restart crond
       ansible.builtin.service:
@@ -8,6 +7,7 @@
         state: restarted
   vars:
     swap_file_size_mb: "{{ 2048 if ansible_memtotal_mb > 2048 else ansible_memtotal_mb }}"
+  tags: basic
   tasks:
 
     - name: Update cache repo
@@ -162,7 +162,8 @@
         security_autoupdate_reboot_time: "10:00"
         security_autoupdate_mail_to: "{{common_playbook_autoupdate_email_address}}"
         security_autoupdate_mail_on_error: true
-
+      tags:
+        - always
 
     - name: Setting firewall rules
       include_role:
@@ -172,3 +173,5 @@
             - firewall
       vars:
         firewall_allowed_tcp_ports: "{{ common_playbook_firewall_tcp_ports }}"
+      tags:
+        - always
