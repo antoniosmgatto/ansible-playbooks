@@ -24,12 +24,6 @@
        - ansible.builtin.apt
        - upgrade
 
-    - name: Set authorized key took from file
-      ansible.posix.authorized_key:
-        user: root
-        state: present
-        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
-
     - name: Install basic packages
       ansible.builtin.apt:
         name: "{{ common_playbook_basic_packages }}"
