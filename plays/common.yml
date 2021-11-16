@@ -6,31 +6,31 @@
   tasks:
 
     - name: Update cache repo
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
         cache_valid_time: 3600
       tags:
-        - apt
+        - ansible.builtin.apt
 
-    - name: Upgrade all apt packages
-      apt:
+    - name: Upgrade all ansible.builtin.apt packages
+      ansible.builtin.apt:
         upgrade: dist
       tags:
-       - apt
+       - ansible.builtin.apt
        - upgrade
 
     - name: Set authorized key took from file
-      authorized_key:
+      ansible.posix.authorized_key:
         user: root
         state: present
         key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
     - name: Install basic packages
-      apt:
+      ansible.builtin.apt:
         name: "{{ common_playbook_basic_packages }}"
 
     - name: Ensure a locale en_US.UTF-8 exists
-      locale_gen:
+      community.general.locale_gen:
         name: en_US.UTF-8
         state: present
 
@@ -118,7 +118,7 @@
         resolv_searchpath: []
 
     - name: Creating admin group
-      group:
+      ansible.builtin.group:
         name: admin
       tags:
         - users
@@ -137,7 +137,7 @@
               - '%admin': ALL=(ALL) NOPASSWD:ALL
 
     - name: Creating Admin Users
-      user:
+      ansible.builtin.group:
         name: "{{ item.name }}"
         shell: /bin/bash
         groups: admin
@@ -146,7 +146,7 @@
         - users
 
     - name: Adding authorized keys for admins
-      authorized_key:
+      ansible.posix.authorized_key:
         user: "{{ item.name }}"
         key: "{{ item.authorized_key }}"
       loop: "{{ common_playbook_admin_users }}"
