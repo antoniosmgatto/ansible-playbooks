@@ -37,35 +37,42 @@
     - name: Setting swap
       include_role:
         name: geerlingguy.swap
-      tags:
-        - swap
+        apply:
+          tags:
+            - swap
 
     - name: Setting timezone
       include_role:
         name: manala.timezone
+        apply:
+          tags:
+            - timezone
       vars:
         manala_timezone_default: "{{ common_playbook_timezone }}"
-      tags:
-        - timezone
 
     - name: Setting ntp servers
-      group:
+      include_role:
         name: manala.ntp
-      tags:
-        - ntp
+        apply:
+          tags:
+            - ntp
 
     - name: Setting ssh login message
       include_role:
         name: manala.motd
+        apply:
+          tags:
+            - ssh
       vars:
         manala_motd_template: template/cow.j2
         manala_motd_message:  muuuuuuuuuuuuuuh
-      tags:
-        - ssh
 
     - name: Setting vim
       include_role:
         name: manala.vim
+        apply:
+          tags:
+            - vim
       vars:
         manala_vim_config_template: config/empty.j2
         manala_vim_config:
@@ -87,28 +94,28 @@
           - 'set smartindent	"# Enable smart-indent'
           - 'set smarttab	"# Enable smart-tabs'
           - 'set softtabstop=2	"# Number of spaces per Tab'
-      tags:
-        - vim
 
     - name: Set hostname
       include_role:
         name: stouts.hostname
+        apply:
+          tags:
+            - hostname
       vars:
         hostname_enabled: yes
         hostname_hostname: "{{inventory_hostname}}"
         hostname_hostname_short: "{{hostname_hostname.split('.')[:-1]|join('.')}}"
-      tags:
-        - hostname
 
     - name: Setting dns servers
       include_role:
         name: ypsman.resolv
+        apply:
+          tags:
+            - dns
       vars:
         resolv_dns_domain: ''
         resolv_dns_server: "{{ common_playbook_dns_servers }}"
         resolv_searchpath: []
-      tags:
-        - dns
 
     - name: Creating admin group
       group:
@@ -119,14 +126,15 @@
     - name: Setting sudo for admin group
       include_role:
         name: manala.sudo
+        apply:
+          tags:
+            - sudo
+            - users
       vars:
         manala_sudo_sudoers:
           - file: admin
             config:
               - '%admin': ALL=(ALL) NOPASSWD:ALL
-      tags:
-        - sudo
-        - users
 
     - name: Creating Admin Users
       user:
