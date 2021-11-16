@@ -22,8 +22,6 @@ roles:
     version: 2.0.7
   - name: manala.ntp
     version: 2.0.1
-  - name: manala.timezone
-    version: 2.0.2
   - name: manala.vim
     version: 2.0.1
   - name: ocha.yarn

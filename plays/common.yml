@@ -1,6 +1,11 @@
 - hosts: all
   become: true
   tags: basic
+  handlers:
+    - name: (Handler) Restart crond
+      ansible.builtin.service:
+        name: crond
+        state: restarted
   vars:
     swap_file_size_mb: "{{ 2048 if ansible_memtotal_mb > 2048 else ansible_memtotal_mb }}"
   tasks:
@@ -42,13 +47,11 @@
             - swap
 
     - name: Setting timezone
-      include_role:
-        name: manala.timezone
-        apply:
-          tags:
-            - timezone
-      vars:
-        manala_timezone_default: "{{ common_playbook_timezone }}"
+      community.general.timezone:
+        name: "{{ common_playbook_timezone }}"
+      notify: (Handler) Restart crond
+      tags:
+        - timezone
 
     - name: Setting ntp servers
       include_role:
