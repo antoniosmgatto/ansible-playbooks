@@ -8,6 +8,10 @@ This repo has the following playbooks:
 
   Generic setup with security concerns (install basic packages and setup apt, dns, firewall, ssh, sudo, swap, timezone )
 
+- rails.yml
+
+  Rails setup (Nginx with ssl suport, puma, database libs (postgresql or mysql) and deploy via Capistrano)
+
 ## Requirements
 
 - Python: 3.9
@@ -22,9 +26,6 @@ pip install -r ./requirements.txt
 
 # download roles from Galaxy
 ./galaxy-update.sh
-
-# create file with vault secret
-echo "your-secret-here" > .vault_pass.txt
 
 # create and setup your inventory
 cp inventory.example production
