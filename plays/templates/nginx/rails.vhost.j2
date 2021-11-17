@@ -1,0 +1,73 @@
+server {
+    server_name {{ vhost_server_name }};
+    root {{ vhost_root_path }};
+    try_files $uri/index.html $uri @puma_production;
+
+    client_max_body_size 10m;
+    keepalive_timeout 10;
+
+    listen 443 ssl http2;
+    ssl_certificate /etc/letsencrypt/live/{{ vhost_server_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ vhost_server_name }}/privkey.pem;
+    include /etc/nginx/options-ssl-nginx.conf;
+    ssl_dhparam /etc/nginx/ssl-dhparams.pem;
+
+    error_page 500 502 504 /500.html;
+    error_page 503 @503;
+
+    location @puma_production {
+      proxy_set_header Host $host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Photo $scheme;
+      proxy_set_header X-Forwarded-Ssl on;
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header X-Forwarded-Port $server_port;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "Upgrade";
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_pass http://puma_production;
+      proxy_redirect off;
+      proxy_read_timeout 3600;
+    }
+
+    location ~* ^(/assets/|/packs/) {
+      gzip_static on;
+      expires max;
+      add_header Cache-Control private;
+      add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+    }
+
+    location = /50x.html {
+      root html;
+    }
+
+    location = /404.html {
+      root html;
+    }
+
+    location @503 {
+      error_page 405 = /system/maintenance.html;
+      if (-f $document_root/system/maintenance.html) {
+        rewrite ^(.*)$ /system/maintenance.html break;
+      }
+      rewrite ^(.*)$ /503.html break;
+    }
+
+    if ($request_method !~ ^(GET|HEAD|PUT|PATCH|POST|DELETE|OPTIONS)$ ){
+      return 405;
+    }
+
+    if (-f $document_root/system/maintenance.html) {
+      return 503;
+    }
+}
+
+server {
+  if ($host = {{ vhost_server_name }}) {
+      return 301 https://$host$request_uri;
+  }
+
+  listen 80;
+  server_name {{ vhost_server_name }};
+  return 404;
+}

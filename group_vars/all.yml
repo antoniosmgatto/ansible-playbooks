@@ -21,3 +21,17 @@ common_playbook_timezone: Etc/UTC
 common_playbook_ssh_port: 22
 common_playbook_firewall_tcp_ports:
   - "{{ common_playbook_ssh_port }}"
+
+rails_playbook_db_type: postgresql # mysql
+rails_playbook_app_dependencies:
+  - git
+  - ffmpeg
+  - imagemagick
+  - yarn
+rails_playbook_deploy_user: deploy
+rails_playbook_nginx_user: nginx
+rails_playbook_deploy_root_path: /srv/www
+rails_playbook_ruby_version: 2.7.4
+rails_playbook_node_version: "14.x"
+rails_playbook_app_domains: []
+rails_playbook_certbot_admin_email: antonio.s.m.gatto@gmail.com

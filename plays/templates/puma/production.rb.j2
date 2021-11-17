@@ -1,0 +1,10 @@
+workers 1
+threads 1, 6
+environment "production"
+bind "unix:{{ deploy_root_path }}/shared/tmp/sockets/puma.sock"
+state_path "{{ deploy_root_path }}/shared/tmp/pids/puma.state"
+stdout_redirect "{{ deploy_root_path }}/shared/log/production.log", "{{ deploy_root_path }}/shared/log/production.log", true
+
+on_worker_boot do
+  ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
+end

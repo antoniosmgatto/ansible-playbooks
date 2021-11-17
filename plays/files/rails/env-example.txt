@@ -1,0 +1,11 @@
+RAILS_ENV='production'
+RAILS_MASTER_KEY='replace-secret'
+DATABASE_URL="postgresql://user:password@db-host/database?sslmode=require"
+
+# Others possible vars
+#
+# REDIS_URL='redis://127.0.0.1:6379'
+# TLD_LENGTH=2
+# DO_SPACES_ACCESS_KEY_ID="replace-secret"
+# DO_SPACES_SECRET_ACCESS_KEY="replace-secret"
+# DO_SPACES_BUCKET="storage-name"

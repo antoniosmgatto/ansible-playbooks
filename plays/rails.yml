@@ -1,0 +1,284 @@
+---
+- name: General server setup (ansible.builtin.apt, sudo, admins, ssh, firewall, etc..)
+  import_playbook: common.yml
+
+- hosts: rails
+  become: true
+  collections:
+    - nginxinc.nginx_core
+
+  handlers:
+    - name: (Handler) Restart NGINX
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+  tasks:
+
+    - name: Allow deploy user to have passwordless sudo for app services
+      ansible.builtin.copy:
+        dest: "/etc/sudoers.d/{{ rails_playbook_deploy_user }}"
+        content: |
+          deploy ALL=NOPASSWD: /usr/bin/systemctl status puma
+          deploy ALL=NOPASSWD: /usr/bin/systemctl start puma
+          deploy ALL=NOPASSWD: /usr/bin/systemctl stop puma
+          deploy ALL=NOPASSWD: /usr/bin/systemctl restart puma
+          deploy ALL=NOPASSWD: /usr/bin/systemctl status puma
+          deploy ALL=NOPASSWD: /usr/bin/systemctl status rails_jobs
+          deploy ALL=NOPASSWD: /usr/bin/systemctl start rails_jobs
+          deploy ALL=NOPASSWD: /usr/bin/systemctl stop rails_jobs
+          deploy ALL=NOPASSWD: /usr/bin/systemctl restart rails_jobs
+          deploy ALL=NOPASSWD: /usr/bin/systemctl status rails_jobs
+        validate: visudo -cf %s
+      tags:
+        - deploy
+        - sudo
+
+    - name: Creating deploy directories
+      ansible.builtin.file:
+        path: "{{ rails_playbook_deploy_root_path  }}/{{ item }}"
+        state: directory
+        owner: "{{ rails_playbook_deploy_user }}"
+        group: "{{ rails_playbook_nginx_user  }}"
+        mode: 0750
+      loop:
+        - releases
+        - repo
+        - shared/config
+        - shared/log
+        - shared/storage
+        - shared/tmp
+      tags:
+        - deploy
+
+    - name: Setting authorized keys for deploy
+      ansible.posix.authorized_key:
+        user: "{{ rails_playbook_deploy_user }}"
+        state: present
+        key: "{{ item }}"
+        exclusive: True
+      with_file:
+        - "{{ lookup('env','HOME') + '/.ssh/id_rsa.pub' }}"
+      tags:
+        - deploy
+
+    - name: Copy .env file example if not exists
+      ansible.builtin.copy:
+        src: rails/env-example.txt
+        dest: "{{ rails_playbook_deploy_root_path  }}/shared/.env"
+        owner: "{{ rails_playbook_deploy_user }}"
+        group: "{{ rails_playbook_nginx_user  }}"
+        mode: '0600'
+        force: false
+      tags:
+        - deploy
+
+    - name: Install nodejs
+      include_role:
+        name: geerlingguy.nodejs
+        apply:
+          tags:
+            - nodejs
+            - yarn
+      vars:
+        nodejs_version: "{{ rails_playbook_node_version }}"
+        nodejs_install_npm_user: "{{ rails_playbook_deploy_user }}"
+      tags:
+        - always
+
+    - name: Setup and install Yarn
+      include_role:
+        name: ocha.yarn
+        apply:
+          tags: yarn
+      tags: always
+
+    - name: Install postgres lib package
+      ansible.builtin.apt:
+        name: libpq-dev
+      when: rails_playbook_db_type == "postgresql"
+      tags:
+        - app
+        - postgres
+        - postgresql
+
+    - name: Install mysql lib package
+      ansible.builtin.apt:
+        name: libmysql++-dev
+      when: rails_playbook_db_type == "mysql"
+      tags:
+        - app
+        - mysql
+
+    - name: Install app dependencies
+      ansible.builtin.apt:
+        name: "{{ rails_playbook_app_dependencies  }}"
+    - name: Creating deploy user as nginx group member
+      ansible.builtin.user:
+        name: "{{ rails_playbook_deploy_user }}"
+        comment: App owner
+        shell: /bin/bash
+        groups: nginx
+      tags:
+        - deploy
+
+    - name: Install rbenv and ruby
+      include_role:
+        name: zzet.rbenv
+        apply:
+          tags:
+            - rbenv
+            - ruby
+      vars:
+        rbenv:
+          env: user
+          version: v1.2.0
+          default_ruby: "{{ rails_playbook_ruby_version }}"
+          rubies:
+            - version: "{{ rails_playbook_ruby_version }}"
+        rbenv_clean_up: false
+        rbenv_users: "{{ rails_playbook_deploy_user }}"
+        rbenv_extra_depends:
+          - acl
+      tags:
+        - rbenv
+        - ruby
+
+    - name: Generating Puma config for production
+      ansible.builtin.template:
+        src: puma/production.rb.j2
+        dest: "{{ rails_playbook_deploy_root_path  }}/shared/config/puma.rb"
+        owner: "{{ rails_playbook_deploy_user }}"
+        group: "{{ rails_playbook_nginx_user  }}"
+        mode: '0644'
+      vars:
+        deploy_root_path: "{{ rails_playbook_deploy_root_path  }}"
+      tags:
+        - puma
+        - systemd
+
+    - name: Add puma service to systemd
+      ansible.builtin.template:
+        src: systemd/puma.j2
+        dest: /etc/systemd/system/puma.service
+        owner: root
+        group: root
+        mode: '0644'
+      vars:
+        deploy_user: "{{ rails_playbook_deploy_user  }}"
+        deploy_root_path: "{{ rails_playbook_deploy_root_path  }}"
+      tags:
+        - puma
+        - systemd
+
+    - name: Reload puma systemd service settings
+      ansible.builtin.systemd:
+        name: puma
+        enabled: yes
+        daemon_reload: yes
+      tags:
+        - puma
+        - systemd
+
+    - name: Add rails jobs service to systemd
+      ansible.builtin.template:
+        src: systemd/rails_jobs.j2
+        dest: /etc/systemd/system/rails_jobs.service
+        owner: root
+        group: root
+        mode: '0644'
+      vars:
+        deploy_user: "{{ rails_playbook_deploy_user  }}"
+        deploy_root_path: "{{ rails_playbook_deploy_root_path  }}"
+      tags:
+        - rails_jobs
+        - systemd
+
+    - name: Reload rails_jobs systemd service settings
+      ansible.builtin.systemd:
+        name: rails_jobs
+        enabled: yes
+        daemon_reload: yes
+      tags:
+        - rails_jobs
+        - systemd
+
+    - name: Install nginx dependencies
+      ansible.builtin.apt:
+        name: gpg
+
+    - name: Install NGINX
+      include_role:
+        name: nginx
+        apply:
+          tags: http
+      vars:
+        nginx_configure: true
+        nginx_config_start: false
+        nginx_debug_output: true
+        nginx_config_cleanup: true
+        nginx_selinux: true
+        nginx_selinux_tcp_ports:
+          - 80
+          - 443
+
+    - name: Remove default nginx file
+      ansible.builtin.file:
+        path: /etc/nginx/conf.d/default.conf
+        state: absent
+      notify: (Handler) Restart NGINX
+      tags: nginx
+
+    - name: Getting ssl dhparams status
+      ansible.builtin.stat:
+        path: /etc/nginx/ssl-dhparams.pem
+      register: dhparams
+      notify: (Handler) Restart NGINX
+      tags: ssl
+
+    - name: Creating ssl dhparams cert
+      ansible.builtin.command: openssl dhparam -out /etc/nginx/ssl-dhparams.pem 2048
+      when: not dhparams.stat.exists
+      notify: (Handler) Restart NGINX
+      tags: ssl
+
+    - name: Install certbot and generate domain ssl certs
+      include_role:
+        name: geerlingguy.certbot
+        apply:
+          tags: ssl
+      vars:
+        certbot_auto_renew: true
+        certbot_auto_renew_user: root
+        certbot_create_method: standalone
+        certbot_admin_email: "{{ rails_playbook_certbot_admin_email }}"
+        certbot_create_if_missing: true
+        certbot_certs:
+          - domains: "{{ rails_playbook_app_domains  }}"
+
+    - name: Allow deploy user to have passwordless sudo for app services
+      ansible.builtin.copy:
+        dest: "/etc/nginx/conf.d/puma_upstream.conf"
+        owner: "root"
+        group: "root"
+        content: |
+          upstream puma_production {
+            server unix:{{ rails_playbook_deploy_root_path  }}/shared/tmp/sockets/puma.sock fail_timeout=0;
+          }
+      notify: (Handler) Restart NGINX
+      tags:
+        - nginx
+
+    - name: Generating nginx vhost conf for rails
+      ansible.builtin.template:
+        src: nginx/rails.vhost.j2
+        dest: "/etc/nginx/conf.d/{{ item  }}.conf"
+        owner: root
+        group: root
+        mode: '0644'
+      vars:
+        vhost_server_name: "{{ item  }}"
+        vhost_root_path: "{{ rails_playbook_deploy_root_path  }}/current/public"
+      with_items: "{{ rails_playbook_app_domains  }}"
+      notify: (Handler) Restart NGINX
+      tags:
+        - nginx
