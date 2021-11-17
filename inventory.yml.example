@@ -16,3 +16,11 @@ all:
         mysql:
           hosts:
             db.example.com:
+
+        rails:
+          hosts:
+            sistema.mrareguladora.com.br:
+              rails_playbook_db_type: mysql
+              rails_playbook_ruby_version: 2.5.9
+              rails_playbook_app_domains:
+               - app.example.com
