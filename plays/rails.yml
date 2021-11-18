@@ -258,6 +258,14 @@
       notify: (Handler) Restart NGINX
       tags: ssl
 
+    - name: Adding nginx conf for ssl
+      ansible.builtin.copy:
+        src: "nginx/options-ssl-nginx.conf"
+        dest: "/etc/nginx/options-ssl-nginx.conf"
+      notify: (Handler) Restart NGINX
+      tags:
+        - nginx
+
     - name: Allow deploy user to have passwordless sudo for app services
       ansible.builtin.copy:
         dest: "/etc/nginx/conf.d/puma_upstream.conf"
