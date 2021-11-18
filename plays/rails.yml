@@ -14,6 +14,28 @@
         state: restarted
   tasks:
 
+    - name: Install certbot and generate domain ssl certs
+      include_role:
+        name: geerlingguy.certbot
+        apply:
+          tags: ssl
+      vars:
+        certbot_auto_renew: true
+        certbot_auto_renew_user: root
+        certbot_create_method: standalone
+        certbot_admin_email: "{{ rails_playbook_certbot_admin_email }}"
+        certbot_create_if_missing: true
+        certbot_certs:
+          - domains: "{{ rails_playbook_app_domains  }}"
+
+    - name: Creating deploy user as nginx group member
+      ansible.builtin.user:
+        name: "{{ rails_playbook_deploy_user }}"
+        comment: App owner
+        shell: /bin/bash
+      tags:
+        - deploy
+
     - name: Allow deploy user to have passwordless sudo for app services
       ansible.builtin.copy:
         dest: "/etc/sudoers.d/{{ rails_playbook_deploy_user }}"
@@ -38,7 +60,7 @@
         path: "{{ rails_playbook_deploy_root_path  }}/{{ item }}"
         state: directory
         owner: "{{ rails_playbook_deploy_user }}"
-        group: "{{ rails_playbook_nginx_user  }}"
+        group: "{{ rails_playbook_deploy_user  }}"
         mode: 0750
       loop:
         - releases
@@ -66,7 +88,7 @@
         src: rails/env-example.txt
         dest: "{{ rails_playbook_deploy_root_path  }}/shared/.env"
         owner: "{{ rails_playbook_deploy_user }}"
-        group: "{{ rails_playbook_nginx_user  }}"
+        group: "{{ rails_playbook_deploy_user  }}"
         mode: '0600'
         force: false
       tags:
@@ -112,14 +134,6 @@
     - name: Install app dependencies
       ansible.builtin.apt:
         name: "{{ rails_playbook_app_dependencies  }}"
-    - name: Creating deploy user as nginx group member
-      ansible.builtin.user:
-        name: "{{ rails_playbook_deploy_user }}"
-        comment: App owner
-        shell: /bin/bash
-        groups: nginx
-      tags:
-        - deploy
 
     - name: Install rbenv and ruby
       include_role:
@@ -148,7 +162,7 @@
         src: puma/production.rb.j2
         dest: "{{ rails_playbook_deploy_root_path  }}/shared/config/puma.rb"
         owner: "{{ rails_playbook_deploy_user }}"
-        group: "{{ rails_playbook_nginx_user  }}"
+        group: "{{ rails_playbook_deploy_user  }}"
         mode: '0644'
       vars:
         deploy_root_path: "{{ rails_playbook_deploy_root_path  }}"
@@ -240,20 +254,6 @@
       when: not dhparams.stat.exists
       notify: (Handler) Restart NGINX
       tags: ssl
-
-    - name: Install certbot and generate domain ssl certs
-      include_role:
-        name: geerlingguy.certbot
-        apply:
-          tags: ssl
-      vars:
-        certbot_auto_renew: true
-        certbot_auto_renew_user: root
-        certbot_create_method: standalone
-        certbot_admin_email: "{{ rails_playbook_certbot_admin_email }}"
-        certbot_create_if_missing: true
-        certbot_certs:
-          - domains: "{{ rails_playbook_app_domains  }}"
 
     - name: Allow deploy user to have passwordless sudo for app services
       ansible.builtin.copy:
