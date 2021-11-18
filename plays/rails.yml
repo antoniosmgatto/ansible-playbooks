@@ -57,18 +57,21 @@
 
     - name: Creating deploy directories
       ansible.builtin.file:
-        path: "{{ rails_playbook_deploy_root_path  }}/{{ item }}"
+        path: "{{ item }}"
         state: directory
+        recurse: yes
         owner: "{{ rails_playbook_deploy_user }}"
-        group: "{{ rails_playbook_deploy_user  }}"
-        mode: 0750
+        group: "{{ rails_playbook_deploy_user }}"
+        mode: 0755
       loop:
-        - releases
-        - repo
-        - shared/config
-        - shared/log
-        - shared/storage
-        - shared/tmp
+        - "{{ rails_playbook_deploy_root_path  }}"
+        - "{{ rails_playbook_deploy_root_path  }}/releases"
+        - "{{ rails_playbook_deploy_root_path  }}/repo"
+        - "{{ rails_playbook_deploy_root_path  }}/shared"
+        - "{{ rails_playbook_deploy_root_path  }}/shared/config"
+        - "{{ rails_playbook_deploy_root_path  }}/shared/log"
+        - "{{ rails_playbook_deploy_root_path  }}/shared/storage"
+        - "{{ rails_playbook_deploy_root_path  }}/shared/tmp"
       tags:
         - deploy
 
