@@ -12,6 +12,7 @@
       ansible.builtin.service:
         name: nginx
         state: restarted
+
   tasks:
 
     - name: Install certbot and generate domain ssl certs
@@ -27,6 +28,18 @@
         certbot_create_if_missing: true
         certbot_certs:
           - domains: "{{ rails_playbook_app_domains  }}"
+
+    - name: Getting stats about ssl certificate
+      ansible.builtin.stat:
+        path: "{{ rails_playbook_ssl_certificate  }}"
+      register: ssl_certificate
+      tags: ssl
+
+    - name: Getting stats about ssl certificate key
+      ansible.builtin.stat:
+        path: "{{ rails_playbook_ssl_certificate_key  }}"
+      register: ssl_certificate_key
+      tags: ssl
 
     - name: Creating deploy user as nginx group member
       ansible.builtin.user:
@@ -282,14 +295,14 @@
     - name: Generating nginx vhost conf for rails
       ansible.builtin.template:
         src: nginx/rails.vhost.j2
-        dest: "/etc/nginx/conf.d/{{ item  }}.conf"
-        owner: root
-        group: root
+        dest: "/etc/nginx/conf.d/app.conf"
         mode: '0644'
       vars:
-        vhost_server_name: "{{ item  }}"
+        vhost_server_name: "{{ rails_playbook_app_domains | join(' ') }}"
         vhost_root_path: "{{ rails_playbook_deploy_root_path  }}/current/public"
-      with_items: "{{ rails_playbook_app_domains  }}"
+        vhost_ssl_certificate: "{{ rails_playbook_ssl_certificate }}"
+        vhost_ssl_certificate_key: "{{ rails_playbook_ssl_certificate_key }}"
+      when: ssl_certificate.stat.exists and ssl_certificate_key.stat.exists
       notify: (Handler) Restart NGINX
       tags:
         - nginx

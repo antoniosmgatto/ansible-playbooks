@@ -35,3 +35,6 @@ rails_playbook_ruby_version: 2.7.4
 rails_playbook_node_version: "14.x"
 rails_playbook_app_domains: []
 rails_playbook_certbot_admin_email: antonio.s.m.gatto@gmail.com
+rails_playbook_ssl_root_path: "/etc/letsencrypt/live/{{ rails_playbook_app_domains | first }}"
+rails_playbook_ssl_certificate: "{{ rails_playbook_ssl_root_path }}/fullchain.pem"
+rails_playbook_ssl_certificate_key: "{{ rails_playbook_ssl_root_path }}/privkey.pem"
