@@ -209,9 +209,9 @@
         - puma
         - systemd
 
-    - name: Add rails jobs service to systemd
+    - name: Setting delayed job as systemd service
       ansible.builtin.template:
-        src: systemd/rails_jobs.j2
+        src: systemd/delayed_job.j2
         dest: /etc/systemd/system/rails_jobs.service
         owner: root
         group: root
@@ -219,8 +219,9 @@
       vars:
         deploy_user: "{{ rails_playbook_deploy_user  }}"
         deploy_root_path: "{{ rails_playbook_deploy_root_path  }}"
+      when: rails_playbook_active_job_queue_adapter == "delayed_job"
       tags:
-        - rails_jobs
+        - delayed_job
         - systemd
 
     - name: Reload rails_jobs systemd service settings

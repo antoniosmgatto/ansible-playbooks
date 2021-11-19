@@ -1,12 +1,12 @@
 [Unit]
-Description=Rails background jobs
+Description=Rails background jobs (DelayedJob)
 After=syslog.target network.target
 
 [Service]
 Type=simple
 EnvironmentFile={{ deploy_root_path  }}/shared/.env
 WorkingDirectory={{ deploy_root_path  }}/current
-ExecStart=/bin/bash -lc 'bundle exec bundle exec rails jobs:work'
+ExecStart=/bin/bash -lc 'bundle exec rails jobs:work'
 User={{ deploy_user  }}
 UMask=0002
 RestartSec=1
