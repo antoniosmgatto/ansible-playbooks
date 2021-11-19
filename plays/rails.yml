@@ -1,6 +1,6 @@
 ---
-- name: General server setup (ansible.builtin.apt, sudo, admins, ssh, firewall, etc..)
-  import_playbook: common.yml
+# - name: General server setup (ansible.builtin.apt, sudo, admins, ssh, firewall, etc..)
+#   import_playbook: common.yml
 
 - hosts: rails
   become: true
@@ -146,6 +146,15 @@
       tags:
         - app
         - mysql
+
+    - name: Install redis
+      include_role:
+        name: geerlingguy.redis
+        apply:
+          tags: redis
+      when: rails_playbook_install_redis
+      tags:
+        - always
 
     - name: Install app dependencies
       ansible.builtin.apt:
