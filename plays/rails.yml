@@ -1,7 +1,4 @@
 ---
-# - name: General server setup (ansible.builtin.apt, sudo, admins, ssh, firewall, etc..)
-#   import_playbook: common.yml
-
 - hosts: rails
   become: true
   collections:
