@@ -203,8 +203,9 @@
         group: root
         mode: '0644'
       vars:
-        deploy_user: "{{ rails_playbook_deploy_user  }}"
-        deploy_root_path: "{{ rails_playbook_deploy_root_path  }}"
+        user: "{{ rails_playbook_deploy_user }}"
+        group: "{{ rails_playbook_nginx_user }}"
+        root_path: "{{ rails_playbook_deploy_root_path  }}"
       tags:
         - puma
         - systemd

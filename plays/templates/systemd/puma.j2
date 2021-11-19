@@ -4,11 +4,13 @@ After=network.target
 
 [Service]
 Type=simple
-User={{ deploy_user  }}
-WorkingDirectory={{ deploy_root_path  }}/current
-EnvironmentFile={{ deploy_root_path  }}/shared/.env
-ExecStart=/home/{{ deploy_user }}/.rbenv/bin/rbenv exec bundle exec puma -C {{ deploy_root_path  }}/shared/config/puma.rb
-ExecStop=/home/{{ deploy_user }}/.rbenv/bin/rbenv exec bundle exec pumactl -S {{ deploy_root_path  }}/shared/tmp/pids/puma.state stop
+User={{ user  }}
+Group={{ group  }}
+UMask=0002
+WorkingDirectory={{ root_path  }}/current
+EnvironmentFile={{ root_path  }}/shared/.env
+ExecStart=/home/{{ user }}/.rbenv/bin/rbenv exec bundle exec puma -C {{ root_path  }}/shared/config/puma.rb
+ExecStop=/home/{{ user }}/.rbenv/bin/rbenv exec bundle exec pumactl -S {{ root_path  }}/shared/tmp/pids/puma.state stop
 TimeoutSec=15
 Restart=always
 
