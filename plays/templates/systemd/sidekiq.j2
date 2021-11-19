@@ -1,0 +1,23 @@
+[Unit]
+Description=Rails background jobs (Sidekiq)
+After=syslog.target network.target
+
+[Service]
+Type=notify
+WatchdogSec=10
+Environment=MALLOC_ARENA_MAX=2
+EnvironmentFile={{ deploy_root_path  }}/shared/.env
+WorkingDirectory={{ deploy_root_path  }}/current
+ExecStart=/bin/bash -lc 'bundle exec sidekiq'
+User={{ deploy_user  }}
+UMask=0002
+RestartSec=1
+Restart=on-failure
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=rails_job_worker_%i
+
+# Use `systemctl kill -s TSTP rails_jobs` to quiet the Sidekiq process
+
+[Install]
+WantedBy=multi-user.target

@@ -211,6 +211,21 @@
 
     - name: Setting delayed job as systemd service
       ansible.builtin.template:
+        src: systemd/sidekiq.j2
+        dest: /etc/systemd/system/rails_jobs.service
+        owner: root
+        group: root
+        mode: '0644'
+      vars:
+        deploy_user: "{{ rails_playbook_deploy_user  }}"
+        deploy_root_path: "{{ rails_playbook_deploy_root_path  }}"
+      when: rails_playbook_active_job_queue_adapter == "sidekiq"
+      tags:
+        - sidekiq
+        - systemd
+
+    - name: Setting delayed job as systemd service
+      ansible.builtin.template:
         src: systemd/delayed_job.j2
         dest: /etc/systemd/system/rails_jobs.service
         owner: root
