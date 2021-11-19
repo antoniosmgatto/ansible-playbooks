@@ -216,7 +216,7 @@
         - puma
         - systemd
 
-    - name: Setting delayed job as systemd service
+    - name: Setting sidekiq as systemd service
       ansible.builtin.template:
         src: systemd/sidekiq.j2
         dest: /etc/systemd/system/rails_jobs.service
