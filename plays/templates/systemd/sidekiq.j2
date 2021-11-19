@@ -8,7 +8,7 @@ WatchdogSec=10
 Environment=MALLOC_ARENA_MAX=2
 EnvironmentFile={{ deploy_root_path  }}/shared/.env
 WorkingDirectory={{ deploy_root_path  }}/current
-ExecStart=/bin/bash -lc 'bundle exec sidekiq'
+ExecStart=/bin/bash -lc 'bundle exec sidekiq -e production'
 User={{ deploy_user  }}
 UMask=0002
 RestartSec=1
